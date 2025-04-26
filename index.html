@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Êxodo Hebreu - Jornada Interativa</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f4f1ee;
+    }
+    #map {
+      height: 90%;
+      width: 100%;
+    }
+    #controls {
+      height: 10%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #333;
+      color: white;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="controls">
+  <button onclick="voltar()">◀ Voltar</button>
+  <button onclick="avancar()">Avançar ▶</button>
+</div>
+
+<!-- Áudio ambiente -->
+<audio id="audio" loop autoplay>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/26/audio_ef05b579d0.mp3?filename=arabian-nights-14000.mp3" type="audio/mpeg">
+  Seu navegador não suporta áudio HTML5.
+</audio>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  var map = L.map('map').setView([29.5, 33.0], 6);
+
+  // Mapa estilo Terreno antigo
+  L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
+    attribution: 'Map tiles by Stamen Design, OpenStreetMap contributors',
+    subdomains: 'abcd',
+    minZoom: 0,
+    maxZoom: 18
+  }).addTo(map);
+
+  // Locais do Êxodo com imagens
+  var locais = [
+    { nome: "Ramessés (Saída do Egito)", coords: [30.800, 31.000], desc: "Local da partida dos hebreus.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Per-Ramesses-ruins.JPG/320px-Per-Ramesses-ruins.JPG" },
+    { nome: "Sucote", coords: [30.600, 31.200], desc: "Primeira parada após a saída.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Sukkot_in_Brooklyn.jpg/320px-Sukkot_in_Brooklyn.jpg" },
+    { nome: "Etã", coords: [30.500, 31.400], desc: "Rumo ao Mar Vermelho.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Desert_of_Etan.jpg/320px-Desert_of_Etan.jpg" },
+    { nome: "Travessia do Mar Vermelho", coords: [29.500, 32.500], desc: "O grande milagre da travessia.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Crossing_of_the_Red_Sea.jpg/320px-Crossing_of_the_Red_Sea.jpg" },
+    { nome: "Mará", coords: [29.200, 32.800], desc: "Águas amargas transformadas.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Mara-desert.jpg/320px-Mara-desert.jpg" },
+    { nome: "Elim", coords: [29.100, 33.100], desc: "Oásis com fontes e palmeiras.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Oasis_in_Sinai.jpg/320px-Oasis_in_Sinai.jpg" },
+    { nome: "Monte Sinai", coords: [28.540, 33.975], desc: "Moisés recebe os 10 Mandamentos.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Mount_Sinai.jpg/320px-Mount_Sinai.jpg" },
+    { nome: "Cades-Barnéia", coords: [30.330, 34.970], desc: "Acampamento prolongado.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Negev_wilderness.jpg/320px-Negev_wilderness.jpg" },
+    { nome: "Monte Nebo", coords: [31.766, 35.725], desc: "Última visão da Terra Prometida.", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Mount_Nebo.jpg/320px-Mount_Nebo.jpg" }
+  ];
+
+  var rota = [];
+  var markers = [];
+  var linha = null;
+  var index = 0;
+
+  // Criar todos os marcadores
+  locais.forEach(function(local) {
+    var popupContent = `<b>${local.nome}</b><br><img src="${local.img}" width="200"><br>${local.desc}`;
+    var marker = L.marker(local.coords).bindPopup(popupContent);
+    markers.push(marker);
+  });
+
+  function desenharRota() {
+    if (linha) {
+      map.removeLayer(linha);
+    }
+    rota = locais.slice(0, index + 1).map(loc => loc.coords);
+    linha = L.polyline(rota, { color: 'darkred', weight: 4 }).addTo(map);
+    map.setView(locais[index].coords, 7);
+    markers[index].addTo(map).openPopup();
+  }
+
+  function avancar() {
+    if (index < locais.length - 1) {
+      index++;
+      desenharRota();
+    }
+  }
+
+  function voltar() {
+    if (index > 0) {
+      index--;
+      desenharRota();
+    }
+  }
+
+  desenharRota(); // Inicia
+
+</script>
+
+</body>
+</html>
